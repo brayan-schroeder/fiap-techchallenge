@@ -161,12 +161,58 @@ public class UserController {
 
             @ApiResponse(
                     responseCode = "404",
-                    description = "User not found"
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                {
+                                  "type": "https://api.techchallenge/errors/not-found",
+                                  "title": "Resource not found",
+                                  "status": 404,
+                                  "detail": "User with id 99 not found",
+                                  "timestamp": "2026-04-30T16:00:00",
+                                  "path": "/api/v1/users/99"
+                                }
+                                """
+                            )
+                    )
             ),
 
             @ApiResponse(
                     responseCode = "409",
-                    description = "Email or login already exists"
+                    description = "Email or login already exists",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Duplicate Email",
+                                            value = """
+                                        {
+                                          "type": "https://api.techchallenge/errors/duplicate-email",
+                                          "title": "Duplicate email",
+                                          "status": 409,
+                                          "detail": "Email already registered",
+                                          "timestamp": "2026-04-30T16:00:00",
+                                          "path": "/api/v1/users/99"
+                                        }
+                                        """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Duplicate Login",
+                                            value = """
+                                        {
+                                          "type": "https://api.techchallenge/errors/duplicate-login",
+                                          "title": "Duplicate login",
+                                          "status": 409,
+                                          "detail": "Login already registered",
+                                          "timestamp": "2026-04-30T16:00:00",
+                                          "path": "/api/v1/users/99"
+                                        }
+                                        """
+                                    )
+                            }
+                    )
             )
     })
     @PutMapping("/{id}")
@@ -232,7 +278,22 @@ public class UserController {
 
             @ApiResponse(
                     responseCode = "404",
-                    description = "User not found"
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                {
+                                  "type": "https://api.techchallenge/errors/not-found",
+                                  "title": "Resource not found",
+                                  "status": 404,
+                                  "detail": "User with id 99 not found",
+                                  "timestamp": "2026-04-30T16:00:00",
+                                  "path": "/api/v1/users/99"
+                                }
+                                """
+                            )
+                    )
             )
     })
     @DeleteMapping("/{id}")
