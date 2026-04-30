@@ -16,7 +16,7 @@ http://localhost:8080/swagger-ui.html
 
 Baixar coleção JSON:
 
-https://github.com/brayan-schroeder/fiap-techchallenge/blob/main/postman_collection.json
+https://raw.githubusercontent.com/brayan-schroeder/fiap-techchallenge/refs/heads/main/postman_collection.json
 
 ---
 
