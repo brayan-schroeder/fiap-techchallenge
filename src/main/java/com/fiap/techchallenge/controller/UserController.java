@@ -1,13 +1,29 @@
 package com.fiap.techchallenge.controller;
 
+import com.fiap.techchallenge.dto.CreateUserRequest;
+import com.fiap.techchallenge.dto.LoginRequest;
 import com.fiap.techchallenge.dto.PasswordRequest;
+import com.fiap.techchallenge.dto.UpdateUserRequest;
 import com.fiap.techchallenge.entity.User;
 import com.fiap.techchallenge.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(
+        name = "Users",
+        description = "User management endpoints"
+)
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -15,35 +31,142 @@ public class UserController {
 
     private final UserService service;
 
+    @Operation(
+            summary = "Create user",
+            description = "Creates a new user in the system"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User created successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "409", description = "Email or login already exists")
+    })
     @PostMapping
-    public User create(@RequestBody User user) {
-        return service.create(user);
+    public ResponseEntity<User> create(
+            @Valid @RequestBody CreateUserRequest request
+    ) {
+
+        User user = new User();
+
+        user.setName(request.name());
+        user.setEmail(request.email());
+        user.setLogin(request.login());
+        user.setPassword(request.password());
+        user.setAddress(request.address());
+        user.setRole(request.role());
+
+        User createdUser = service.create(user);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdUser);
     }
 
+    @Operation(
+            summary = "List users",
+            description = "Returns all users or filters by name"
+    )
+    @ApiResponse(responseCode = "200", description = "Users found")
     @GetMapping
-    public List<User> list(@RequestParam(required = false) String name) {
-        if (name != null) return service.search(name);
-        return service.findAll();
+    public ResponseEntity<List<User>> list(
+            @RequestParam(required = false) String name
+    ) {
+        if (name != null && !name.isBlank()) {
+            return ResponseEntity.ok(service.search(name));
+        }
+
+        return ResponseEntity.ok(service.findAll());
     }
 
+    @Operation(
+            summary = "Find user by id",
+            description = "Returns a single user by id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @GetMapping("/{id}")
-    public User get(@PathVariable Long id) {
-        return service.findById(id);
+    public ResponseEntity<User> get(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(service.findById(id));
     }
 
+    @Operation(
+            summary = "Update user",
+            description = "Updates user data except password"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User updated"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "409", description = "Email or login already exists")
+    })
     @PutMapping("/{id}")
-    public User update(@PathVariable Long id, @RequestBody User user) {
-        return service.update(id, user);
+    public ResponseEntity<User> update(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequest request
+    ) {
+
+        User user = new User();
+
+        user.setName(request.name());
+        user.setEmail(request.email());
+        user.setLogin(request.login());
+        user.setAddress(request.address());
+        user.setRole(request.role());
+
+        return ResponseEntity.ok(service.update(id, user));
     }
 
+    @Operation(
+            summary = "Change password",
+            description = "Updates only user password"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Password updated"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @PatchMapping("/{id}/password")
-    public void password(@PathVariable Long id,
-                         @RequestBody PasswordRequest request) {
-        service.updatePassword(id, request.getPassword());
+    public ResponseEntity<Void> password(
+            @PathVariable Long id,
+            @Valid @RequestBody PasswordRequest request
+    ) {
+        service.updatePassword(id, request.password());
+
+        return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Delete user",
+            description = "Deletes a user by id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "User deleted"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
         service.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Login",
+            description = "Validates user login and password"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authenticated"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
+    @PostMapping("/login")
+    public ResponseEntity<Boolean> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        service.login(request);
+
+        return ResponseEntity.ok(true);
     }
 }

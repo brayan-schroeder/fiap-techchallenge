@@ -1,9 +1,19 @@
 package com.fiap.techchallenge.dto;
 
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
-@Data
-public class PasswordRequest {
+@Schema(
+        name = "PasswordRequest",
+        description = "Request payload to update user password"
+)
+public record PasswordRequest(
 
-    private String password;
+        @Schema(
+                description = "New user password",
+                example = "newPassword123"
+        )
+        @NotBlank(message = "Password is required")
+        String password
+) {
 }
