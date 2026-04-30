@@ -37,8 +37,49 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User created successfully"),
-            @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "409", description = "Email or login already exists")
+
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Validation error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "type": "https://api.techchallenge/errors/validation",
+                                      "title": "Validation error",
+                                      "status": 400,
+                                      "detail": "One or more fields are invalid",
+                                      "timestamp": "2026-04-30T16:00:00",
+                                      "path": "/api/v1/users",
+                                      "fields": {
+                                        "email": "Invalid email"
+                                      }
+                                    }
+                                    """
+                            )
+                    )
+            ),
+
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email or login already exists",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "type": "https://api.techchallenge/errors/duplicate-email",
+                                      "title": "Duplicate email",
+                                      "status": 409,
+                                      "detail": "Email already registered",
+                                      "timestamp": "2026-04-30T16:00:00",
+                                      "path": "/api/v1/users"
+                                    }
+                                    """
+                            )
+                    )
+            )
     })
     @PostMapping
     public ResponseEntity<User> create(
@@ -83,7 +124,26 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User found"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "type": "https://api.techchallenge/errors/not-found",
+                                      "title": "Resource not found",
+                                      "status": 404,
+                                      "detail": "User with id 99 not found",
+                                      "timestamp": "2026-04-30T16:00:00",
+                                      "path": "/api/v1/users/99"
+                                    }
+                                    """
+                            )
+                    )
+            )
     })
     @GetMapping("/{id}")
     public ResponseEntity<User> get(
@@ -98,8 +158,16 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User updated"),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "409", description = "Email or login already exists")
+
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found"
+            ),
+
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email or login already exists"
+            )
     })
     @PutMapping("/{id}")
     public ResponseEntity<User> update(
@@ -124,7 +192,26 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Password updated"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "type": "https://api.techchallenge/errors/not-found",
+                                      "title": "Resource not found",
+                                      "status": 404,
+                                      "detail": "User with id 99 not found",
+                                      "timestamp": "2026-04-30T16:00:00",
+                                      "path": "/api/v1/users/99/password"
+                                    }
+                                    """
+                            )
+                    )
+            )
     })
     @PatchMapping("/{id}/password")
     public ResponseEntity<Void> password(
@@ -142,7 +229,11 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "User deleted"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found"
+            )
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
@@ -159,7 +250,26 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Authenticated"),
-            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid credentials",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                    {
+                                      "type": "https://api.techchallenge/errors/unauthorized",
+                                      "title": "Invalid credentials",
+                                      "status": 401,
+                                      "detail": "Invalid login or password",
+                                      "timestamp": "2026-04-30T16:00:00",
+                                      "path": "/api/v1/users/login"
+                                    }
+                                    """
+                            )
+                    )
+            )
     })
     @PostMapping("/login")
     public ResponseEntity<Boolean> login(
